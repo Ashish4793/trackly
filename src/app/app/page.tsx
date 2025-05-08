@@ -20,6 +20,8 @@ import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
 import toast, { Toaster } from "react-hot-toast";
+
+
 const notifyAdded = () =>
   toast.success("New Job Added!", {
     style: {
@@ -38,8 +40,29 @@ const notifyEdited = () =>
       color: "#fff",
     },
   });
+
 const notifyDeleted = () =>
   toast.success("Job Deleted!", {
+    style: {
+      borderRadius: "10px",
+      border: "1px solid rgb(56, 56, 56)",
+      background: "#000",
+      color: "#fff",
+    },
+  });
+
+  const notifyFailed = () =>
+  toast.error("Failed to perform action. Try again later!", {
+    style: {
+      borderRadius: "10px",
+      border: "1px solid rgb(56, 56, 56)",
+      background: "#000",
+      color: "#fff",
+    },
+  });
+
+  const notifyWorking = (message : string) =>
+  toast.loading(message, {
     style: {
       borderRadius: "10px",
       border: "1px solid rgb(56, 56, 56)",
@@ -74,18 +97,23 @@ export default function App() {
   const [loading, setLoading] = useState(true)
 
 
-  
   // Fetch jobs from API
   useEffect(() => {
     async function fetchJobs() {
+      const toastId = notifyWorking("Getting jobs...");
       try {
+
         const res = await fetch("/api/jobs")
         const data = await res.json()
         setJobs(data)
         setFilteredJobs(data)
       } catch (error) {
+
+        notifyFailed();
         console.error("Failed to fetch jobs:", error)
       } finally {
+        toast.dismiss(toastId);
+
         setLoading(false)
       }
     }
@@ -109,6 +137,7 @@ export default function App() {
   // Add new job
   const handleAddJob = async (job: Omit<JobApplication, "id">) => {
     try {
+      const toastIdForHandleAddJob = notifyWorking("Saving...")
       const formData = new FormData();
 
       formData.append("company", job.company);
@@ -128,6 +157,7 @@ export default function App() {
       });
 
       if (!res.ok) {
+        notifyFailed();
         throw new Error("Failed to create job");
       }
 
@@ -135,6 +165,8 @@ export default function App() {
 
       setJobs([createdJob, ...jobs]);
       setIsAddingJob(false);
+      toast.dismiss(toastIdForHandleAddJob);
+
       notifyAdded();
     } catch (error) {
       console.error("Error creating job:", error);
@@ -144,6 +176,8 @@ export default function App() {
   // Update existing job
   const handleUpdateJob = async (updatedJob: JobApplication) => {
     try {
+      const toastIdForHandleUpdateJob = notifyWorking("Updating...");
+
       const res = await fetch(`/api/jobs/${updatedJob.id}`, {
         method: "PUT",
         headers: {
@@ -153,6 +187,7 @@ export default function App() {
       });
 
       if (!res.ok) {
+        notifyFailed();
         throw new Error("Failed to update job");
       }
 
@@ -163,6 +198,8 @@ export default function App() {
       );
       setIsEditingJob(false);
       setSelectedJob(null);
+      toast.dismiss(toastIdForHandleUpdateJob);
+
       notifyEdited();
     } catch (error) {
       console.error("Error updating job:", error);
@@ -172,11 +209,14 @@ export default function App() {
   // Delete job
   const handleDeleteJob = async (id: string) => {
     try {
+      const toastIdForHandleDeleteJob = notifyWorking("Deleting...");
+
       const res = await fetch(`/api/jobs/${id}`, {
         method: "DELETE",
       });
 
       if (!res.ok) {
+        notifyFailed();
         throw new Error("Failed to delete job");
       }
 
@@ -187,6 +227,7 @@ export default function App() {
         setSelectedJob(null);
         setViewingJobDetails(false);
       }
+      toast.dismiss(toastIdForHandleDeleteJob);
 
       notifyDeleted();
     } catch (error) {
