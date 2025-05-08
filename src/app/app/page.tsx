@@ -16,11 +16,10 @@ import {
 
 import JobForm from "./job-form";
 import JobDetails from "./job-details";
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 import toast, { Toaster } from "react-hot-toast";
-
 
 const notifyAdded = () =>
   toast.success("New Job Added!", {
@@ -51,7 +50,7 @@ const notifyDeleted = () =>
     },
   });
 
-  const notifyFailed = () =>
+const notifyFailed = () =>
   toast.error("Failed to perform action. Try again later!", {
     style: {
       borderRadius: "10px",
@@ -61,7 +60,7 @@ const notifyDeleted = () =>
     },
   });
 
-  const notifyWorking = (message : string) =>
+const notifyWorking = (message: string) =>
   toast.loading(message, {
     style: {
       borderRadius: "10px",
@@ -94,33 +93,29 @@ export default function App() {
   const [viewingJobDetails, setViewingJobDetails] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [jobToDelete, setJobToDelete] = useState<JobApplication | null>(null); // or JobApplication type
-  const [loading, setLoading] = useState(true)
-
+  const [loading, setLoading] = useState(true);
 
   // Fetch jobs from API
   useEffect(() => {
     async function fetchJobs() {
       const toastId = notifyWorking("Getting jobs...");
       try {
-
-        const res = await fetch("/api/jobs")
-        const data = await res.json()
-        setJobs(data)
-        setFilteredJobs(data)
+        const res = await fetch("/api/jobs");
+        const data = await res.json();
+        setJobs(data);
+        setFilteredJobs(data);
       } catch (error) {
-
         notifyFailed();
-        console.error("Failed to fetch jobs:", error)
+        console.error("Failed to fetch jobs:", error);
       } finally {
         toast.dismiss(toastId);
 
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    fetchJobs()
-  }, [])
-
+    fetchJobs();
+  }, []);
 
   // Filter jobs based on search term
   useEffect(() => {
@@ -137,7 +132,7 @@ export default function App() {
   // Add new job
   const handleAddJob = async (job: Omit<JobApplication, "id">) => {
     try {
-      const toastIdForHandleAddJob = notifyWorking("Saving...")
+      const toastIdForHandleAddJob = notifyWorking("Saving...");
       const formData = new FormData();
 
       formData.append("company", job.company);
@@ -324,6 +319,8 @@ export default function App() {
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <header className="mb-8">
+        <h1 className="text-3xl text-white bg-[#C04000] italic rounded-2xl px-6 py-4 font-bold inline-block mb-6 tracking-tight">trackly</h1>
+
           <h1 className="text-3xl font-bold text-gray-50">Job Applications</h1>
           <p className="mt-1 text-sm text-gray-50">
             Track and manage your job search process
@@ -367,7 +364,11 @@ export default function App() {
             </div>
             <JobForm
               job={selectedJob}
-              onSubmit={handleUpdateJob as (job: JobApplication | Omit<JobApplication, "id">) => void}
+              onSubmit={
+                handleUpdateJob as (
+                  job: JobApplication | Omit<JobApplication, "id">
+                ) => void
+              }
               onCancel={() => {
                 setIsEditingJob(false);
                 setSelectedJob(null);
@@ -425,83 +426,100 @@ export default function App() {
             </div>
 
             <div className="bg-stone-900 border border-stone-800 rounded-xl shadow-sm overflow-hidden">
-  {loading ? (
-    <div className="p-6 space-y-4">
-      <Skeleton style={{marginBottom : '1.2rem'}} height={38} baseColor="#292524" highlightColor="#57534d" />
-      <Skeleton style={{marginBottom : '1.2rem'}} height={38} baseColor="#292524" highlightColor="#57534d" />
-      <Skeleton height={38} baseColor="#292524" highlightColor="#57534d" />
-
-    </div>
-  ) : filteredJobs.length === 0 ? (
-    <div className="p-8 text-center">
-      <p className="text-gray-50">No job applications found. Add your first one!</p>
-    </div>
-  ) : (
-    <ul className="divide-y divide-stone-600">
-      {filteredJobs.map((job) => (
-        <li
-          key={job.id}
-          className="p-4 hover:bg-stone-800 transition-colors cursor-pointer"
-          onClick={() => handleViewJobDetails(job)}
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 bg-stone-500 rounded-full flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-gray-200" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-gray-50">{job.position}</h3>
-                <p className="text-sm text-gray-300">
-                  {job.company} • {job.location}
-                </p>
-              </div>
+              {loading ? (
+                <div className="p-6 space-y-4">
+                  <Skeleton
+                    style={{ marginBottom: "1.2rem" }}
+                    height={38}
+                    baseColor="#292524"
+                    highlightColor="#57534d"
+                  />
+                  <Skeleton
+                    style={{ marginBottom: "1.2rem" }}
+                    height={38}
+                    baseColor="#292524"
+                    highlightColor="#57534d"
+                  />
+                  <Skeleton
+                    height={38}
+                    baseColor="#292524"
+                    highlightColor="#57534d"
+                  />
+                </div>
+              ) : filteredJobs.length === 0 ? (
+                <div className="p-8 text-center">
+                  <p className="text-gray-50">
+                    No job applications found. Add your first one!
+                  </p>
+                </div>
+              ) : (
+                <ul className="divide-y divide-stone-600">
+                  {filteredJobs.map((job) => (
+                    <li
+                      key={job.id}
+                      className="p-4 hover:bg-stone-800 transition-colors cursor-pointer"
+                      onClick={() => handleViewJobDetails(job)}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-10 h-10 bg-stone-500 rounded-full flex items-center justify-center">
+                            <Building2 className="w-5 h-5 text-gray-200" />
+                          </div>
+                          <div>
+                            <h3 className="text-base font-bold text-gray-50">
+                              {job.position}
+                            </h3>
+                            <p className="text-sm text-gray-300">
+                              {job.company} • {job.location}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 ml-0 sm:ml-auto">
+                          <div className="text-sm text-gray-300">
+                            {new Date(job.date).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </div>
+                          <div
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                              job.status
+                            )}`}
+                          >
+                            <span className="mr-1">
+                              {getStatusIcon(job.status)}
+                            </span>
+                            {job.status}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditJob(job);
+                              }}
+                              className="p-1 text-gray-400 hover:text-yellow-400 rounded-full hover:bg-stone-400"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setJobToDelete(job);
+                                setShowDeleteModal(true);
+                              }}
+                              className="p-1 text-gray-400 hover:text-red-600 rounded-full hover:bg-stone-400"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-            <div className="flex items-center gap-4 ml-0 sm:ml-auto">
-              <div className="text-sm text-gray-300">
-                {new Date(job.date).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </div>
-              <div
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                  job.status
-                )}`}
-              >
-                <span className="mr-1">{getStatusIcon(job.status)}</span>
-                {job.status}
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditJob(job);
-                  }}
-                  className="p-1 text-gray-400 hover:text-yellow-400 rounded-full hover:bg-stone-400"
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setJobToDelete(job);
-                    setShowDeleteModal(true);
-                  }}
-                  className="p-1 text-gray-400 hover:text-red-600 rounded-full hover:bg-stone-400"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </li>
-      ))}
-    </ul>
-  )}
-</div>
-
-            
           </>
         )}
       </div>
